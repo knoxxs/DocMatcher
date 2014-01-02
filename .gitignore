@@ -3,7 +3,8 @@ mod*
 
 #Corpus#
 ###################
-data/
+data/*
+docs/build/*
 
 # Compiled source #
 ###################
