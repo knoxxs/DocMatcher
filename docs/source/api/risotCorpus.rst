@@ -4,8 +4,8 @@ risotCorpus
 .. automodule:: risotCorpus.__init__
    :members:
 
-read
-====
+readDirectory
+=============
 
-.. automodule:: risotCorpus.read
+.. automodule:: risotCorpus.readDirectory
    :members:
