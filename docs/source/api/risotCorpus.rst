@@ -9,3 +9,9 @@ readDirectory
 
 .. automodule:: risotCorpus.readDirectory
    :members:
+
+preProcess
+==========
+
+.. automodule:: risotCorpus.preProcess
+   :members:
