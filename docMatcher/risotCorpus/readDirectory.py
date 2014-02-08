@@ -6,13 +6,17 @@ at the top level.
 
 If you are running this file directly then you need to pass the path of corpus
 else you need to set the path of the corpus in the global variable named
-``corpusPath``.
+``corpusPath`` manualy.
 
-Then you first need to call the function :func:`findOcredOrigDirectory`. This
-is a pre-requisite to all the other functions.
+Then you first need to call the function :func:``findOcredOrigDirectory`` (or
+also you can set the path for ocred and original directorly in the variables
+``ocredCorpusPath`` & ``origCorpusPath`` respectively). This is a pre-requisite to
+all the other functions.
 """
+
 import sys
 import os
+import itertools
 
 corpusPath, origCorpusPath, ocredCorpusPath = None, None, None
 
@@ -26,15 +30,15 @@ def findOcredOrigDirectory(corpusPath):
     """
     global origCorpusPath, ocredCorpusPath
 
-    for content in os.listdir(firstArg):
-        if os.path.isdir(content):
+    for content in os.listdir(corpusPath):
+        if os.path.isdir(os.path.join(corpusPath, content)):
             if content.find('original') >= 0:
-                origCorpusPath = firstArg + '/' + content
+                origCorpusPath = os.path.join(corpusPath, content)
             elif content.find('ocred') >= 0:
-                ocredCorpusPath = firstArg + '/' + content
+                ocredCorpusPath = os.path.join(corpusPath, content)
     if not (origCorpusPath and ocredCorpusPath):
         print 'ERROR: Following two directories are not in the\
-            directory(%s):' % firstArg
+            directory(%s):' % corpusPath
         print "One directory with the word 'original' in its name and\
             other with the word 'ocred' in it."
 
@@ -48,7 +52,7 @@ def _readDirectory(dirPath):
     """
     for (path, dirnames, filenames) in os.walk(dirPath):
         for file_ in filenames:
-            yield path + '/' + f
+            yield os.path.join(path, file_)
 
 def readOcredDirectory():
     """
@@ -56,7 +60,8 @@ def readOcredDirectory():
 
     :return: its a gnerator of filenames relative to the corpus path
     """
-    _readDirectory(ocredCorpusPath)
+    for doc in _readDirectory(ocredCorpusPath):
+        yield doc
 
 def readOrigDirectory():
     """
@@ -64,7 +69,8 @@ def readOrigDirectory():
 
     :return: its a gnerator of filenames relative to the corpus path
     """
-    _readDirectory(origCorpusPath)
+    for doc in _readDirectory(origCorpusPath):
+        yield doc
 
 def readBothDirectory():
     """
@@ -79,19 +85,22 @@ def readBothDirectory():
     :return: its a gnerator of filenames relative to the corpus path in the
         form ``(origFile, ocredFile)``
     """
-    for origFile, ocredFile in izip(readOrigDirectory(), readOcredDirectory()):
+    for origFile, ocredFile in itertools.izip(readOrigDirectory(), readOcredDirectory()):
         yield (origFile, ocredFile)
     
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         firstArg = sys.argv[1]
         if firstArg == '-h':
-            print 'You have to pass the path to corpus like python read.py \
+            print 'You have to pass the path to corpus like python readDirectory.py \
             <corpus path>'
         elif os.path.isdir(firstArg):
             corpusPath = firstArg
+            findOcredOrigDirectory(corpusPath)
         else:
             print "ERROR: Directory(%s) don't exist" % firstArg
 
+        # for x in readOrigDirectory():
+        #     print x
     else:
         print 'Use python read.py -h for help.'
